@@ -173,8 +173,9 @@ public class ConvertVideoPacket {
     public void start() throws IOException {
 
         //刷新开始的测试数据
-        if(null != grabber)
+        if(null != grabber){
             grabber.flush();
+        }
 
         while (flag) {
             avcodec.AVPacket pkt = null;
