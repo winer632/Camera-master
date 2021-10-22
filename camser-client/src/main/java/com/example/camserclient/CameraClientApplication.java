@@ -19,7 +19,7 @@ public class CameraClientApplication {
         System.out.println("---------------启动成功---------------");
 
         //rtmp服务器拉流地址
-        String inputPath = "rtmp://127.0.0.1/live/stream";
+        String inputPath = "rtmp://106.15.107.185:1935/live/livestream";
         PullStream pullStream = new PullStream();
         try {
             pullStream.getPullStream(inputPath);
