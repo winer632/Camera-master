@@ -26,12 +26,23 @@ public class RecordPush {
      * @throws Exception
      * @throws org.bytedeco.javacv.FrameRecorder.Exception
      * @throws InterruptedException
+     *
+     * Simply put, a GOP is the distance between two keyframes,
+     * measured in the number of frames, or the amount of time between keyframes.
+     * For example, if a keyframe is inserted every 1 second into a video at 30 frames per second,
+     * the GOP length is 30 frames, or 1 second.
+     *
      */
     public void getRecordPush(String outputPath, int v_rs) throws Exception, org.bytedeco.javacv.FrameRecorder.Exception, InterruptedException {
 
         Loader.load(opencv_objdetect.class);
         //创建视频帧采集器 本地摄像头默认为0
-        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+//        OpenCVFrameGrabber grabber = new OpenCVFrameGrabber(0);
+        String src = "rtsp://sxtest:Goodsense@10.8.10.57:80";
+        FFmpegFrameGrabber grabber = new FFmpegFrameGrabber(src);
+        if (src.indexOf("rtsp") >= 0) {
+            grabber.setOption("rtsp_transport", "tcp");
+        }
         //开启采集器
         try {
             grabber.start();
@@ -61,7 +72,7 @@ public class RecordPush {
         recorder.setVideoCodec(avcodec.AV_CODEC_ID_H264);
         recorder.setFormat("flv");
         recorder.setFrameRate(v_rs);
-        recorder.setGopSize(v_rs);
+        recorder.setGopSize(2);
 
         //开启录制器
         try {
@@ -96,7 +107,7 @@ public class RecordPush {
                 recorder.record(rotatedFrame);
             }
             //50毫秒/帧
-            Thread.sleep(50);
+            Thread.sleep(40);
         }
     }
     public static void getRecordPush() throws FrameGrabber.Exception, FrameRecorder.Exception, InterruptedException {

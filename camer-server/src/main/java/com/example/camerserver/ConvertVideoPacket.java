@@ -113,7 +113,7 @@ public class ConvertVideoPacket {
         }
         // 视频参数
         audiocodecid = grabber.getAudioCodec();
-        log.warn("音频编码：{}",audiocodecid);
+
         codecid = grabber.getVideoCodec();
         // 帧率
         framerate = grabber.getVideoFrameRate();
@@ -123,6 +123,14 @@ public class ConvertVideoPacket {
         // 想要录制音频，这三个参数必须有：audioChannels > 0 && audioBitrate > 0 && sampleRate > 0
         audioChannels = grabber.getAudioChannels();
         audioBitrate = grabber.getAudioBitrate();
+        sampleRate = grabber.getSampleRate();
+        System.out.println("音频编码："+audiocodecid);
+        System.out.println("视频编码："+codecid);
+        System.out.println("帧率："+framerate);
+        System.out.println("比特率："+bitrate);
+        System.out.println("音频通道："+audioChannels);
+        System.out.println("音频比特率："+audioBitrate);
+        System.out.println("采样率："+sampleRate);
         if (audioBitrate < 1) {
             // 默认音频比特率
             audioBitrate = 128 * 1000;
@@ -136,18 +144,40 @@ public class ConvertVideoPacket {
      * @param out t\ rtmp媒体流服务器地址
      * @author JW
      * @throws IOException
+     *
+     * 分辨率	    帧率	    码率期望值
+     * 640 × 368	15fps	800kbps
+     * 960 × 544	15fps	1000kbps
+     * 1280 × 720	15fps	1500kbps
+     * 1920 × 1080	15fps	2500kbps
+     *
      */
     public ConvertVideoPacket rtmp(String out) throws IOException {
         // 录制/推流器
         record = new FFmpegFrameRecorder(out, width, height);
+        // 确定视频格式
+        record.setFormat("flv");
+        // 确定编码格式
+        record.setVideoCodec(avcodec.AV_CODEC_ID_H264);
         record.setVideoOption("crf", "30");
-        record.setGopSize(2);
-        record.setFrameRate(framerate);
-        record.setVideoBitrate(bitrate);
+        record.setMaxBFrames(3);
+        record.setGopSize(100);
+        record.setVideoQuality(1);
+        record.setFrameRate(25);
+        record.setVideoBitrate(50*1000*1000);
 
-        record.setAudioChannels(audioChannels);
-        record.setAudioBitrate(audioBitrate);
-        record.setSampleRate(sampleRate);
+        // 音频设置
+        record.setAudioOption("crf", "0");
+        // 设置音频质量
+        record.setAudioQuality(0);
+        // 设置音频比特率
+        record.setAudioBitrate(192000);
+        // 设置采样频率
+        record.setSampleRate(44100);
+        // 设置声道数
+        record.setAudioChannels(2);
+        //设置音频编码格式
+        record.setAudioCodec(avcodec.AV_CODEC_ID_AAC);
 
         AVFormatContext fc = null;
 
@@ -233,7 +263,7 @@ public class ConvertVideoPacket {
 
         // 运行，设置视频源和推流地址
         new ConvertVideoPacket()
-                .rtsp("rtsp://admin:a1234567@192.168.0.121:554/h264/ch1/main/av_stream") // ip 厂家提供的的摄像头地址
-                .rtmp("rtmp://127.0.0.1:1935/live/stream").start();
+                .rtsp("rtsp://sxtest:Goodsense@10.8.10.57:80")
+                .rtmp("/Users/wangxinxin/Downloads/test.flv").start();
     }
 }
