@@ -41,9 +41,10 @@ public class PullStream {
         while (true){
             //拉流
             Frame frame = grabber.grabImage();
-            opencv_core.Mat mat = converter.convertToMat(frame);
-            //播放
-            canvasFrame.showImage(frame);
+            if(null!=frame) {
+                //播放
+                canvasFrame.showImage(frame);
+            }
         }
     }
 }
